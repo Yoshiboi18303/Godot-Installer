@@ -1,8 +1,7 @@
-namespace Godot_Installer.Enums
+namespace GodotInstaller.Enums;
+
+public enum GodotInstallationType
 {
-    public enum GodotInstallationType
-    {
-        Normal,
-        Mono
-    }
+    GDScript,
+    Mono
 }
