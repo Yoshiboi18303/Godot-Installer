@@ -21,7 +21,7 @@ This program only works on Windows as far I can guess, sorry MacOS/Linux users. 
 
 ## Contributing
 
-Contributing to this project is highly appreciated. Here's how you can contribute!
+Contributing to this project is highly appreciated and helps a lot. Here's how you can contribute!
 
 ### Contribution Prerequisites
 
