@@ -1,7 +1,7 @@
-﻿using Godot_Installer.Enums;
-using Godot_Installer.Utils;
+﻿using GodotInstaller.Enums;
+using GodotInstaller.Utils;
 
-namespace Godot_Installer;
+namespace GodotInstaller;
 
 class Input
 {
@@ -20,19 +20,17 @@ class Input
 
 class Program
 {
-    public static ConsoleColorer _console = new();
-
     public static void Main()
     {
         Console.Clear();
-        _console.WriteLine("Godot Installer\n", ConsoleColor.Cyan);
-        _console.WriteLine("WARNING: This is NOT an official installer, and is NOT maintained by the owners of the Godot Engine.", ConsoleColor.Red);
-        _console.Write("Press enter to start, press Ctrl+C otherwise.", ConsoleColor.Gray);
+        Logger.Log("Godot Installer\n", ConsoleColor.Cyan);
+        Logger.Log("WARNING: This is NOT an official installer, and is NOT maintained by the owners of the Godot Engine.", ConsoleColor.Red);
+        Logger.LogInline("Press enter to start, press Ctrl+C otherwise.", ConsoleColor.Gray);
         Console.ReadLine();
 
         var answers = GetAnswers();
 
-        GodotInstaller godotInstaller = new(answers.GodotInstallationType);
+        Utils.GodotInstaller godotInstaller = new(answers.GodotInstallationType);
 
         var path = godotInstaller.GetZipFileAsync().Result;
 
@@ -43,7 +41,7 @@ class Program
             godotInstaller.CreateGodotDesktopShortcut(Path.Join(answers.DestinationPath, GetExe(godotInstaller.GetGodotUrl(answers.GodotInstallationType).Split("/")[^1])));
         }
 
-        _console.Write($"Godot Engine{(answers.GodotInstallationType == GodotInstallationType.Mono ? " Mono" : "")} installed at \"{answers.DestinationPath}\"! Press enter to exit.", ConsoleColor.Green);
+        Logger.LogInline($"Godot Engine{(answers.GodotInstallationType == GodotInstallationType.Mono ? " Mono" : "")} installed at \"{answers.DestinationPath}\"! Press enter to exit.", ConsoleColor.Green);
         Console.ReadLine();
     }
 
@@ -70,16 +68,16 @@ class Program
         Console.Write("Please enter your Godot type (Normal/Mono): ");
         var godotType = Console.ReadLine();
 
-        if (godotType != "Normal" && godotType != "Mono")
+        if (godotType is not "Normal" and not "Mono")
         {
-            _console.WriteLine("Invalid input provided, assuming Normal...", ConsoleColor.Red);
+            Logger.Log("Invalid input provided, assuming Normal...", ConsoleColor.Red);
         }
 
-        GodotInstallationType installationType = godotType == "Mono" ? GodotInstallationType.Mono : GodotInstallationType.Normal;
+        GodotInstallationType installationType = godotType == "Mono" ? GodotInstallationType.Mono : GodotInstallationType.GDScript;
 
-        _console.WriteLine($"\nNOTE: Do NOT enter a path that requires administrative permissions (for example: {Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)}), doing so can result in unexpected issues.", ConsoleColor.Yellow);
-        _console.WriteLine($@"NOTE: Do NOT enter the Godot AppData path ({Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\Godot), doing so may cause unexpected issues while using Godot.", ConsoleColor.Yellow);
-        _console.WriteLine($"TIP: Want to put it on your Desktop? Add \"&DESKTOP\" to the start of the path!\n", ConsoleColor.Cyan);
+        Logger.Log($"\nNOTE: Do NOT enter a path that requires administrative permissions (for example: {Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)}), doing so can result in unexpected issues.", ConsoleColor.Yellow);
+        Logger.Log($@"NOTE: Do NOT enter the Godot AppData path ({Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\Godot), doing so may cause unexpected issues while using Godot.", ConsoleColor.Yellow);
+        Logger.Log($"TIP: Want to put it on your Desktop? Add \"&DESKTOP\" to the start of the path!\n", ConsoleColor.Cyan);
 
         Console.Write("Please enter your destination path: ");
         var destinationPath = Console.ReadLine();
@@ -94,7 +92,7 @@ class Program
             }
             else
             {
-                _console.WriteLine("ERROR: Invalid path, please try again.", ConsoleColor.Red);
+                Logger.Log("ERROR: Invalid path, please try again.", ConsoleColor.Red);
                 Console.Write("Please enter your destination path: ");
                 destinationPath = Console.ReadLine();
                 destinationPath = destinationPath.Replace("&DESKTOP", $"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}");
@@ -103,7 +101,7 @@ class Program
 
         Console.Write("Would you like a Desktop shortcut to be created? (Y/n) ");
         var createDesktopShortcutInput = Console.ReadLine().ToLower();
-        bool createDesktopShortcut = createDesktopShortcutInput == "" || createDesktopShortcutInput == "y" || createDesktopShortcutInput == "yes";
+        bool createDesktopShortcut = createDesktopShortcutInput is "" or "y" or "yes";
 
         return new(installationType, destinationPath, createDesktopShortcut);
     }
